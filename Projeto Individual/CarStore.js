@@ -1,11 +1,13 @@
+const enviarEmail = require('./enviarEmail.js')
+
 function diaDaSemana() {
-    const diasDaSemana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+    const diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
     const hoje = new Date();
     return diasDaSemana[hoje.getDay()];
 }
 
 function éDiaÚtil(dia) {
-    return ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'].includes(dia);
+    return dia === 'Segunda-feira';
 }
 
 function construirCorpoEmail() {
@@ -16,18 +18,21 @@ function construirCorpoEmail() {
     return `${novosVeiculos}\n${maisVendidos}\n${condicoesAquisicao}`;
 }
 
-function enviarEmailsParaClientes(listaClientes, carrosMaisVendidos) {
+async function enviarEmailsParaClientes(listaClientes, carrosMaisVendidos) {
     const hoje = diaDaSemana();
     
-    if (hoje !== 'Segunda-feira') {
-        console.log("Hoje não é dia de enviar e-mails.");
+    if (!éDiaÚtil(hoje)) {
+        console.log("Hoje não é segunda-feira. Não há e-mails para enviar.");
         return;
     }
     
     console.log(`Enviando e-mails para os clientes na ${hoje}:`);
-    listaClientes.forEach(cliente => {
+    listaClientes.forEach(async cliente => {
         if (cliente.receberEmailsMarketing) {
             console.log(`- Enviando e-mail para ${cliente.email}`);
+            const assunto = 'Novidades da semana';
+            const corpo = construirCorpoEmail();
+            await enviarEmail(cliente.email, assunto, corpo);
         }
     });
     
